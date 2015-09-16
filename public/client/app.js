@@ -4,7 +4,8 @@ window.Shortly = Backbone.View.extend({
   events: {
     'click li a.index':  'renderIndexView',
     'click li a.create': 'renderCreateView',
-    'click li a.login':  'renderLoginView'
+    'click li a.login':  'renderLoginView',
+    'click li a.logout': 'renderLogout'
   },
 
   initialize: function(){
@@ -33,9 +34,14 @@ window.Shortly = Backbone.View.extend({
   },
 
   renderLoginView: function(e){
-    //this.template = Templates['login'];
     e && e.preventDefault();
     this.router.navigate('/login', {trigger: true});
+  },
+
+  renderLogout: function(e){
+    e && e.preventDefault();
+    //this.app.session.destroy();
+    //this.renderLoginView;
   },
 
   updateNav: function(routeName){

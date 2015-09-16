@@ -24,7 +24,6 @@ Shortly.Router = Backbone.Router.extend({
   },
 
   login: function(){
-    //var links = new Shortly.Links();
     var linksView = new Shortly.LinksView({ collection: links });
     this.swapView(linksView);
   },

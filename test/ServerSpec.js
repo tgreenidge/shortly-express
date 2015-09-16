@@ -18,8 +18,9 @@ var xbeforeEach = function(){};
 
 
 describe('', function() {
-
+  this.timeout(5000);
   beforeEach(function() {
+    this.timeout(5000);
     // log out currently signed in user
     request('http://127.0.0.1:4568/logout', function(error, res, body) {});
 
@@ -63,7 +64,9 @@ describe('', function() {
 
     var requestWithSession = request.defaults({jar: true});
 
-    beforeEach(function(done){      // create a user that we can then log-in with
+    beforeEach(function(done){
+      this.timeout(5000);
+        // create a user that we can then log-in with
       new User({
           'username': 'Phillip',
           'password': 'Phillip'
@@ -154,6 +157,7 @@ describe('', function() {
       var link;
 
       beforeEach(function(done){
+        this.timeout(5000);
         // save a link to the database
         link = new Link({
           url: 'http://roflzoo.com/',
@@ -237,8 +241,8 @@ describe('', function() {
 
   }); // 'Priviledged Access'
 
-  xdescribe('Account Creation:', function(){
-
+  describe('Account Creation:', function(){
+    this.timeout(10000);
     it('Signup creates a user record', function(done) {
       var options = {
         'method': 'POST',
@@ -285,11 +289,12 @@ describe('', function() {
 
   }); // 'Account Creation'
 
-  xdescribe('Account Login:', function(){
+  describe('Account Login:', function(){
 
     var requestWithSession = request.defaults({jar: true});
 
     beforeEach(function(done){
+      this.timeout(5000);
       new User({
           'username': 'Phillip',
           'password': 'Phillip'

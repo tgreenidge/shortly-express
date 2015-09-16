@@ -23,7 +23,7 @@ app.use(bodyParser.json());
 // Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
-app.use(session({ secret: '$#%!@#@@#SSDASASDVV@@@@', key: 'sid'}));
+app.use(session({ secret: '$#%!@#@@#SSDASASDVV@@@@', key: 'sid', resave: false, saveUninitialized: false }));
 
 var restrict = function(request, response, next) {
   if (request.session.user) {
@@ -34,17 +34,17 @@ var restrict = function(request, response, next) {
   }
 };
 
-app.get('/',
+app.get('/', restrict,
 function(req, res) {
   res.render('index');
 });
 
-app.get('/create',
+app.get('/create', restrict,
 function(req, res) {
   res.render('index');
 });
 
-app.get('/links',
+app.get('/links', restrict,
 function(req, res) {
   Links.reset().fetch().then(function(links) {
     res.send(200, links.models);
@@ -102,23 +102,47 @@ app.post('/login', function(request, response) {
   var username = request.body.username;
   var password = request.body.password;
 
-  new User({'username': username.toLowerCase()}).fetch()
+  new User({'username': username}).fetch()
     .then(function(user) {
-      if( !user || user.get('password') !== password ){
-        response.redirect('login'); //TODO - why not passing test for login?
+      if( !user || user.authenticate(password) ){
+        response.redirect('/login'); //TODO - why not passing test for login?
       }else{
+        console.log(request.session);
         request.session.regenerate(function() {
           request.session.user = username;
-          response.redirect('/links');
+          response.redirect('/');
         });
       }
   });
-
-
-
 });
 
-/************************************************************/
+app.post('/signup', function (request, response) {
+  var username = request.body.username;
+  var password = request.body.password;
+  //check database for username
+    //if username in DB =>  error username already taken; redirect to signup page
+      // else user.signUp
+  new User({'username': username}).fetch()
+    .then(function(user) {
+      if (user) {
+        response.render('signup', function(error, html){
+        html += "<h5>Username already taken. Please enter a new username or login to your account. </h5>"; //fix aesthetics
+        response.send(html);
+        });
+      } else {
+        var user = new User( {'username': username, 'password': password} );
+        user.save().then(function() {
+          response.redirect('/');
+        });
+      }
+    })
+    .catch(function(err){
+      console.error("NOT SAVED TRY AGAIN");
+      response.send(500);
+    });
+});
+
+/**********************************************************/
 // Handle the wildcard route last - if all other routes fail
 // assume the route is a short code and try and handle it here.
 // If the short-code doesn't exist, send the user to '/'

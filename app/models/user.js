@@ -7,19 +7,20 @@ var User = db.Model.extend({
   hasTimestamps: true,
 
   initialize: function (){
-    this.on('creating', function(model, attributes, options){
-      var salt = bcrypt.genSaltSync(10);
-      var hash = bcrypt.hashSync(attributes.password, salt);
-      model.set('password', hash);
-    });
+    this.on('creating', this.signUp);
   },
 
   authenticate: function (pwAttempt) {
-    bcrypt.compareSync(pwAttempt, password);
+    bcrypt.compareSync(pwAttempt, this.get('password'));
+  },
+
+  signUp: function (model, attributes, options) {
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(attributes.password, salt);
+    model.set('password', hash);
   }
-
-
-
 });
+
+
 
 module.exports = User;
